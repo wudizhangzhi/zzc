@@ -45,19 +45,24 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnGenericMotionListener;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 import uk.co.senab.photoview.PhotoView;
 
+@SuppressLint("NewApi")
 public class ActivityWrite extends Activity implements OnClickListener {
-	Button btn_choose, btn_saveupload, btn_clear, btn_changemode;
-	// DrawPic drawpic;
+	Button btn_choose, btn_saveupload, btn_clear;
+	ToggleButton btn_toggle;
 	DrawView drawView;
 	PhotoView photoView;
 
-	boolean isWrite = false;
 
 	public static final String URL = "http://192.168.1.196/";
 
@@ -69,6 +74,7 @@ public class ActivityWrite extends Activity implements OnClickListener {
 		initView();
 	}
 
+	@SuppressLint("NewApi")
 	private void initView() {
 		drawView = (DrawView) findViewById(R.id.drawview_write);
 		photoView = (PhotoView) findViewById(R.id.photo);
@@ -76,13 +82,36 @@ public class ActivityWrite extends Activity implements OnClickListener {
 		btn_choose = (Button) findViewById(R.id.btn_choose);
 		btn_saveupload = (Button) findViewById(R.id.btn_saveupload);
 		btn_clear = (Button) findViewById(R.id.btn_clear);
-		btn_changemode = (Button) findViewById(R.id.btn_changemode);
+		btn_toggle = (ToggleButton) findViewById(R.id.toggleButton1);
 
-		// drawpic = (DrawPic) findViewById(R.id.drawPic);
+		// btn_saveupload.setClickable(false);
+
 		btn_choose.setOnClickListener(this);
 		btn_saveupload.setOnClickListener(this);
 		btn_clear.setOnClickListener(this);
-		btn_changemode.setOnClickListener(this);
+		btn_toggle.setChecked(true);
+		btn_toggle.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				String text = "";
+				if (isChecked) {
+					text = "手写打开";
+					drawView.bringToFront();
+					drawView.setVisibility(View.VISIBLE);
+					drawView.setEnabled(true);
+					photoView.setEnabled(false);
+				} else {
+					text = "手写关闭";
+					drawView.setVisibility(View.GONE);
+					drawView.setEnabled(false);
+					photoView.setEnabled(true);
+				}
+				Toast.makeText(ActivityWrite.this, text, Toast.LENGTH_SHORT).show();
+				//
+
+			}
+		});
 	}
 
 	@SuppressLint("NewApi")
@@ -98,48 +127,30 @@ public class ActivityWrite extends Activity implements OnClickListener {
 			task.execute();
 			break;
 		case R.id.btn_clear:
-			// TODO
-//			 drawpic.clear();
-//			drawView.clear();
-//			drawView.setImageAlpha(255);
-//			drawView.setBackgroundColor(Color.TRANSPARENT);
-//			drawView.invalidate();
-//			drawView.invalidateDrawable(drawView.getDrawable());
-//			drawView.setImageResource(0);
-//			drawView.setImageResource(android.R.color.transparent);
+			// drawpic.clear();
+			// drawView.clear();
+			// drawView.setImageAlpha(255);
+			// drawView.setBackgroundColor(Color.TRANSPARENT);
+			// drawView.invalidate();
+			// drawView.invalidateDrawable(drawView.getDrawable());
+			// drawView.setImageResource(0);
+			// drawView.setImageResource(android.R.color.transparent);
 			drawView.clear();
-			break;
-		case R.id.btn_changemode:
-			if (isWrite) {
-				drawView.setVisibility(View.GONE);
-				drawView.setEnabled(false);
-				// drawView.setFocusableInTouchMode(false);
-				photoView.setEnabled(true);
-				// photoView.setFocusable(true);
-				// photoView.setFocusableInTouchMode(true);
-				isWrite = false;
-			} else {
-				drawView.bringToFront();
-				drawView.setImageAlpha(0);
-				drawView.setVisibility(View.VISIBLE);
-				drawView.setEnabled(true);
-				// drawView.setFocusableInTouchMode(true);
-				photoView.setEnabled(false);
-				// photoView.setFocusable(false);
-				// photoView.setFocusableInTouchMode(false);
-				isWrite = true;
-			}
 			break;
 		default:
 			break;
 		}
 	}
 
+	Uri uri;// 选中图片的uri
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if (resultCode == RESULT_OK) {
-			Uri uri = data.getData();
+			// // 设置保存按钮可按
+			// btn_saveupload.setClickable(true);
+			uri = data.getData();
 			// drawpic.ImageShowURIPic(uri);
 			try {
 				photoView.setImageBitmap(MediaStore.Images.Media.getBitmap(getContentResolver(), uri));
@@ -179,30 +190,33 @@ public class ActivityWrite extends Activity implements OnClickListener {
 			// 保存文件
 			File file = new File(Environment.getExternalStorageDirectory(), name);
 			// 合并图片
-			Bitmap b1 = drawView.getPathBitmap();
+			Bitmap b1 = drawView.getPathBitmap();//手写层
 			photoView.setDrawingCacheEnabled(true);
-			Bitmap b2 = photoView.getDrawingCache();
+			// Bitmap b2 = photoView.getDrawingCache();
+			Bitmap b2 = null;//图片层
+			try {
+				if (getContentResolver()!=null) {
+					b2 = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+				}
+			} catch (FileNotFoundException e2) {
+				e2.printStackTrace();
+			} catch (IOException e2) {
+				e2.printStackTrace();
+			}
 			try {
 				fos = new FileOutputStream(file);
 			} catch (FileNotFoundException e1) {
 				e1.printStackTrace();
 			}
+			// 保存至文件
 			composeBitmap(b1, b2).compress(CompressFormat.PNG, 50, fos);
-			if (fos!=null) {
+			if (fos != null) {
 				try {
 					fos.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
-			// 保存至文件
-			// try {
-			// TODO
-			// drawpic.saveToFile(file.getAbsolutePath());
-			// } catch (FileNotFoundException e) {
-			// e.printStackTrace();
-			// return "保存失败:"+e.getMessage();
-			// }
 			// 上传
 			HttpClient httpClient = new DefaultHttpClient();
 			HttpPost httpPost = new HttpPost(URL);
@@ -227,13 +241,21 @@ public class ActivityWrite extends Activity implements OnClickListener {
 			return "文件：" + name + "保存上传成功";
 		}
 
-		/**
-		 * 合并bitmap
-		 * 
-		 * @param b1：上层
-		 * @param b2：底层
-		 */
-		private Bitmap composeBitmap(Bitmap b1, Bitmap b2) {
+		@Override
+		protected void onPostExecute(String text) {
+			super.onPostExecute(text);
+			Toast.makeText(ActivityWrite.this, text, Toast.LENGTH_SHORT).show();
+		}
+	}
+
+	/**
+	 * 合并bitmap
+	 * 
+	 * @param b1：上层
+	 * @param b2：底层
+	 */
+	private Bitmap composeBitmap(Bitmap b1, Bitmap b2) {
+		if (b2!=null) {
 			Bitmap b = Bitmap.createBitmap(b2.getWidth(), b2.getHeight(), b2.getConfig());
 			Canvas canvas = new Canvas(b);
 			Paint paint = new Paint();
@@ -242,12 +264,8 @@ public class ActivityWrite extends Activity implements OnClickListener {
 			canvas.drawBitmap(b2, new Matrix(), paint);
 			canvas.drawBitmap(b1, new Matrix(), paint);
 			return b;
-		}
-
-		@Override
-		protected void onPostExecute(String text) {
-			super.onPostExecute(text);
-			Toast.makeText(ActivityWrite.this, text, Toast.LENGTH_SHORT).show();
+		}else {
+			return b1;
 		}
 	}
 

@@ -446,7 +446,6 @@ int id activity_chooser_view_content 0x7f090024
 int id alertTitle 0x7f09002e
 int id always 0x7f090019
 int id beginning 0x7f09001e
-int id btn_changemode 0x7f090052
 int id btn_choose 0x7f09004f
 int id btn_clear 0x7f090051
 int id btn_saveupload 0x7f090050
@@ -521,6 +520,7 @@ int id textSpacerNoButtons 0x7f090031
 int id time 0x7f09005d
 int id title 0x7f09002a
 int id title_template 0x7f09002d
+int id toggleButton1 0x7f090052
 int id topPanel 0x7f09002c
 int id tv_content 0x7f090056
 int id up 0x7f090001

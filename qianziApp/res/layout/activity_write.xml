@@ -33,13 +33,15 @@
             android:layout_weight="1"
             android:text="清除"
             android:textSize="13sp" />
-        <Button
-            android:id="@+id/btn_changemode"
+
+        <ToggleButton
+            android:id="@+id/toggleButton1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="手写开关"
-            android:textSize="13sp" />
+            android:textOff="手写:关"
+            android:textOn="手写：开" />
+
     </LinearLayout>
 
     <FrameLayout

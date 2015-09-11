@@ -72,7 +72,6 @@ public class DrawView extends ImageView {
 	/**
 	 * 清空画布
 	 */
-	// TODO 如何清空
 	public void clear() {
 		// 清屏
 		Paint p = new Paint();

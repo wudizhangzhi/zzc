@@ -2003,7 +2003,6 @@ containing a value of this type.
         public static final int alertTitle=0x7f09002e;
         public static final int always=0x7f090019;
         public static final int beginning=0x7f09001e;
-        public static final int btn_changemode=0x7f090052;
         public static final int btn_choose=0x7f09004f;
         public static final int btn_clear=0x7f090051;
         public static final int btn_saveupload=0x7f090050;
@@ -2078,6 +2077,7 @@ containing a value of this type.
         public static final int time=0x7f09005d;
         public static final int title=0x7f09002a;
         public static final int title_template=0x7f09002d;
+        public static final int toggleButton1=0x7f090052;
         public static final int topPanel=0x7f09002c;
         public static final int tv_content=0x7f090056;
         public static final int up=0x7f090001;
